@@ -1,28 +1,21 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { toast } from '../components/ui/use-toast';
-
-interface User {
-  nome?: string;
-  email: string;
-}
+import { Button } from '../components/ui/button';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(JSON.parse(localStorage.getItem('user') || 'null'));
+  const isAuthenticated = !!localStorage.getItem('user');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [itemName, setItemName] = useState('');
   const [itemState, setItemState] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isAuthenticated) return;
+    
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -35,6 +28,8 @@ const DashboardPage: React.FC = () => {
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    if (!isAuthenticated) return;
+    
     const file = event.dataTransfer.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -51,6 +46,8 @@ const DashboardPage: React.FC = () => {
 
   const handleSubmitQuote = (event: React.FormEvent) => {
     event.preventDefault();
+    if (!isAuthenticated) return;
+    
     setIsSubmitting(true);
 
     // Simulate API call
@@ -86,66 +83,80 @@ const DashboardPage: React.FC = () => {
         <section id="cotacao" className="max-w-5xl mx-auto px-4 mb-16">
           <h2 className="text-2xl font-bold text-center mb-6 uppercase">Solicite uma cotação</h2>
           <div className="brutalist-border bg-white p-8 flex flex-col md:flex-row gap-8">
-            <div
-              className={`w-full md:w-1/2 h-48 border-2 border-dashed ${uploadedImage ? 'border-black' : 'border-gray-400'} flex items-center justify-center cursor-pointer`}
-              onClick={() => document.getElementById('fileInput')?.click()}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-            >
-              {uploadedImage ? (
-                <img src={uploadedImage} alt="Product preview" className="max-h-full max-w-full" />
-              ) : (
-                <div className="text-center p-4 text-gray-500">
-                  <p>Arraste uma foto ou clique para enviar</p>
-                </div>
-              )}
-              <input
-                id="fileInput"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-              />
-            </div>
-            
-            <form onSubmit={handleSubmitQuote} className="w-full md:w-1/2 space-y-4">
-              <div>
-                <label className="block font-bold text-sm mb-1">NOME DA PEÇA</label>
-                <input
-                  type="text"
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  required
-                  className="brutalist-input w-full"
-                  placeholder="Ex: Bolsa Chanel Classic Flap"
-                />
-              </div>
-              
-              <div>
-                <label className="block font-bold text-sm mb-1">ESTADO DA PEÇA</label>
-                <select
-                  value={itemState}
-                  onChange={(e) => setItemState(e.target.value)}
-                  required
-                  className="brutalist-input w-full"
+            {!isAuthenticated ? (
+              <div className="w-full flex flex-col items-center justify-center p-8">
+                <p className="text-lg mb-6 text-center">Para solicitar uma cotação, você precisa estar logado.</p>
+                <Button 
+                  onClick={() => navigate('/login')} 
+                  className="brutalist-button"
                 >
-                  <option value="">Selecione o estado</option>
-                  <option value="novo">Novo</option>
-                  <option value=">9.5">Acima de 9.5</option>
-                  <option value=">9">Acima de 9</option>
-                  <option value=">8.5">Acima de 8.5</option>
-                  <option value="8.5">8.5 para baixo</option>
-                </select>
+                  FAZER LOGIN
+                </Button>
               </div>
-              
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="brutalist-button w-full"
-              >
-                {isSubmitting ? 'ENVIANDO...' : 'SOLICITAR COTAÇÃO'}
-              </button>
-            </form>
+            ) : (
+              <>
+                <div
+                  className={`w-full md:w-1/2 h-48 border-2 border-dashed ${uploadedImage ? 'border-black' : 'border-gray-400'} flex items-center justify-center cursor-pointer`}
+                  onClick={() => document.getElementById('fileInput')?.click()}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                >
+                  {uploadedImage ? (
+                    <img src={uploadedImage} alt="Product preview" className="max-h-full max-w-full" />
+                  ) : (
+                    <div className="text-center p-4 text-gray-500">
+                      <p>Arraste uma foto ou clique para enviar</p>
+                    </div>
+                  )}
+                  <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                </div>
+                
+                <form onSubmit={handleSubmitQuote} className="w-full md:w-1/2 space-y-4">
+                  <div>
+                    <label className="block font-bold text-sm mb-1">NOME DA PEÇA</label>
+                    <input
+                      type="text"
+                      value={itemName}
+                      onChange={(e) => setItemName(e.target.value)}
+                      required
+                      className="brutalist-input w-full"
+                      placeholder="Ex: Bolsa Chanel Classic Flap"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block font-bold text-sm mb-1">ESTADO DA PEÇA</label>
+                    <select
+                      value={itemState}
+                      onChange={(e) => setItemState(e.target.value)}
+                      required
+                      className="brutalist-input w-full"
+                    >
+                      <option value="">Selecione o estado</option>
+                      <option value="novo">Novo</option>
+                      <option value=">9.5">Acima de 9.5</option>
+                      <option value=">9">Acima de 9</option>
+                      <option value=">8.5">Acima de 8.5</option>
+                      <option value="8.5">8.5 para baixo</option>
+                    </select>
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="brutalist-button w-full"
+                  >
+                    {isSubmitting ? 'ENVIANDO...' : 'SOLICITAR COTAÇÃO'}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
         </section>
 
@@ -162,10 +173,10 @@ const DashboardPage: React.FC = () => {
                 <p className="text-xl font-bold">R$ 18.000</p>
                 <p className="mb-4">40% de sinal</p>
                 <button 
-                  onClick={() => navigate('/products/1')} 
+                  onClick={() => isAuthenticated ? navigate('/products/1') : navigate('/login')} 
                   className="brutalist-button w-full"
                 >
-                  RESERVAR COM SINAL
+                  {isAuthenticated ? 'RESERVAR COM SINAL' : 'FAZER LOGIN PARA RESERVAR'}
                 </button>
               </div>
             </div>
@@ -180,10 +191,10 @@ const DashboardPage: React.FC = () => {
                 <p className="text-xl font-bold">R$ 9.000</p>
                 <p className="mb-4">45% de sinal</p>
                 <button 
-                  onClick={() => navigate('/products/2')} 
+                  onClick={() => isAuthenticated ? navigate('/products/2') : navigate('/login')} 
                   className="brutalist-button w-full"
                 >
-                  RESERVAR COM SINAL
+                  {isAuthenticated ? 'RESERVAR COM SINAL' : 'FAZER LOGIN PARA RESERVAR'}
                 </button>
               </div>
             </div>
@@ -198,10 +209,10 @@ const DashboardPage: React.FC = () => {
                 <p className="text-xl font-bold">R$ 13.500</p>
                 <p className="mb-4">40% de sinal</p>
                 <button 
-                  onClick={() => navigate('/products/3')} 
+                  onClick={() => isAuthenticated ? navigate('/products/3') : navigate('/login')} 
                   className="brutalist-button w-full"
                 >
-                  RESERVAR COM SINAL
+                  {isAuthenticated ? 'RESERVAR COM SINAL' : 'FAZER LOGIN PARA RESERVAR'}
                 </button>
               </div>
             </div>
@@ -220,10 +231,10 @@ const DashboardPage: React.FC = () => {
               <div className="text-center">
                 <p className="text-xl font-bold">R$ 6.500</p>
                 <button 
-                  onClick={() => navigate('/products/4')} 
+                  onClick={() => isAuthenticated ? navigate('/products/4') : navigate('/login')} 
                   className="brutalist-button w-full"
                 >
-                  COMPRAR AGORA
+                  {isAuthenticated ? 'COMPRAR AGORA' : 'FAZER LOGIN PARA COMPRAR'}
                 </button>
               </div>
             </div>

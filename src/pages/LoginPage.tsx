@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Logo } from "../components/Logo";
@@ -17,7 +18,7 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://mentor-piano-white-recordings.trycloudflare.com/auth/login",
+        "http://localhost:3000/auth/login",
         {
           method: "POST",
           headers: {

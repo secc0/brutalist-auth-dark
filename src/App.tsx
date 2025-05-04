@@ -26,10 +26,10 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/dashboard" element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/products/:id" element={isAuthenticated ? <ProductDetail /> : <Navigate to="/login" />} />
             <Route path="/quoted-items" element={isAuthenticated ? <QuotedItems /> : <Navigate to="/login" />} />
             <Route path="/ready-to-ship" element={isAuthenticated ? <ReadyToShipItems /> : <Navigate to="/login" />} />
