@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        "https://validation-graduation-learning-listed.trycloudflare.com/auth/login",
+        "https://mentor-piano-white-recordings.trycloudflare.com/auth/login",
         {
           method: "POST",
           headers: {
