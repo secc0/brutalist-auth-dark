@@ -1,7 +1,7 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Staatliches&display=swap");
 
 @layer base {
   :root {
@@ -41,12 +41,15 @@
   * {
     @apply border-border;
   }
-  
+
   body {
-    @apply bg-background text-foreground font-mono;
+    @apply bg-background text-foreground;
+    font-family: "Staatliches", sans-serif;
   }
-  
-  input, button, textarea {
+
+  input,
+  button,
+  textarea {
     font-family: inherit;
   }
 }
