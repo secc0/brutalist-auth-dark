@@ -18,7 +18,7 @@ const LoginPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/auth/login",
+        "https://mentor-piano-white-recordings.trycloudflare.com/auth/login",
         {
           method: "POST",
           headers: {
