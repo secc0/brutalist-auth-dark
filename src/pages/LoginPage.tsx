@@ -12,30 +12,41 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    // Simulate login
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      // For demonstration, we're simulating an API call
+      // In a real app, this would be a fetch to your backend
+      const loginData = {
+        email,
+        password
+      };
       
-      // Check if credentials exist (demo only, replace with actual auth)
-      if (email && password) {
-        localStorage.setItem('user', JSON.stringify({ email }));
-        toast({
-          title: "Login successful",
-          description: "Welcome back to hypeLeads",
-        });
-        navigate('/dashboard');
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Please check your credentials",
-          variant: "destructive",
-        });
-      }
-    }, 1000);
+      console.log('Login Request:', loginData);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulate successful login
+      localStorage.setItem('user', JSON.stringify({ email }));
+      
+      toast({
+        title: "Login successful",
+        description: "Welcome to Importa Luxo",
+      });
+      
+      navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "Please check your credentials",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

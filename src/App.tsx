@@ -8,6 +8,11 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import NotFound from "./pages/NotFound";
+import ProductDetail from "./pages/ProductDetail";
+import QuotedItems from "./pages/QuotedItems";
+import ReadyToShipItems from "./pages/ReadyToShipItems";
+import MyQuotes from "./pages/MyQuotes";
+import MyOrders from "./pages/MyOrders";
 
 const queryClient = new QueryClient();
 
@@ -24,7 +29,12 @@ const App = () => {
             <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard" element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />} />
+            <Route path="/products/:id" element={isAuthenticated ? <ProductDetail /> : <Navigate to="/login" />} />
+            <Route path="/quoted-items" element={isAuthenticated ? <QuotedItems /> : <Navigate to="/login" />} />
+            <Route path="/ready-to-ship" element={isAuthenticated ? <ReadyToShipItems /> : <Navigate to="/login" />} />
+            <Route path="/my-quotes" element={isAuthenticated ? <MyQuotes /> : <Navigate to="/login" />} />
+            <Route path="/my-orders" element={isAuthenticated ? <MyOrders /> : <Navigate to="/login" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

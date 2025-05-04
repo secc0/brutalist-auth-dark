@@ -70,3 +70,64 @@
 .brutalist-header {
   @apply text-2xl md:text-3xl font-bold uppercase tracking-wider;
 }
+
+/* Navigation Styles */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background-color: #000;
+  color: #fff;
+  transition: top 0.3s ease;
+  flex-wrap: wrap;
+  border-bottom: 2px solid white;
+}
+
+.topbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 0;
+  background-color: #111;
+  margin-right: 10px;
+  transition: background 0.2s ease;
+  border: 1px solid white;
+}
+
+.topbar a:hover {
+  background-color: #333;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 600px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .nav-left,
+  .nav-right {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .topbar a {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+}

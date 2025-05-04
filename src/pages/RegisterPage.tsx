@@ -8,13 +8,13 @@ import { toast } from '../components/ui/use-toast';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -28,20 +28,37 @@ const RegisterPage: React.FC = () => {
     
     setLoading(true);
     
-    // Simulate registration
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      // For demonstration, we're simulating an API call
+      const registerData = {
+        nome,
+        email,
+        password
+      };
       
-      // Store user data (demo only, replace with actual auth)
-      localStorage.setItem('user', JSON.stringify({ name, email }));
+      console.log('Register Request:', registerData);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulate successful registration
+      localStorage.setItem('user', JSON.stringify({ nome, email }));
       
       toast({
         title: "Registration successful",
-        description: "Welcome to hypeLeads",
+        description: "Welcome to Importa Luxo",
       });
       
       navigate('/dashboard');
-    }, 1000);
+    } catch (error) {
+      toast({
+        title: "Registration failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,13 +73,13 @@ const RegisterPage: React.FC = () => {
           
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block uppercase font-bold mb-1">Name</label>
+              <label htmlFor="nome" className="block uppercase font-bold mb-1">Full Name</label>
               <Input 
-                id="name"
+                id="nome"
                 type="text" 
                 placeholder="Your Name" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
                 required
                 className="brutalist-input"
               />

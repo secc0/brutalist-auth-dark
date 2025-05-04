@@ -1,93 +1,238 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Logo } from '../components/Logo';
-import { Button } from '../components/ui/button';
+import Navigation from '../components/Navigation';
 import { toast } from '../components/ui/use-toast';
 
 interface User {
-  name?: string;
+  nome?: string;
   email: string;
 }
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(JSON.parse(localStorage.getItem('user') || 'null'));
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [itemName, setItemName] = useState('');
+  const [itemState, setItemState] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    // Check if user is logged in
-    const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
-      navigate('/login');
-      return;
-    }
-    
-    setUser(JSON.parse(storedUser));
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out",
-    });
+  if (!user) {
     navigate('/login');
+    return null;
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  if (!user) return null;
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleSubmitQuote = (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast({
+        title: "Cotação enviada com sucesso!",
+        description: "Entraremos em contato em breve.",
+      });
+      setUploadedImage(null);
+      setItemName('');
+      setItemState('');
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="brutalist-border p-4 flex justify-between items-center">
-        <Logo className="h-12" />
-        <div className="flex items-center gap-4">
-          <span className="font-bold hidden md:block">
-            {user.name || user.email}
-          </span>
-          <Button 
-            onClick={handleLogout}
-            className="brutalist-button py-2"
-          >
-            LOGOUT
-          </Button>
-        </div>
-      </header>
+      <Navigation />
       
       {/* Main Content */}
-      <main className="container mx-auto p-4 max-w-6xl">
-        <div className="brutalist-card mt-8 mb-8">
-          <h1 className="brutalist-header mb-6">WELCOME TO HYPELEADS</h1>
-          <p className="text-lg mb-6">
-            This is your brutalist dashboard. Your leads and campaigns will appear here.
+      <main className="pt-20">
+        <header className="text-center p-6">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">Importação de Peças de Luxo</h1>
+          <p className="max-w-2xl mx-auto text-lg">
+            Realizamos importações de peças de luxo com valor justo e entrega
+            rápida. Escolha uma das três modalidades: Solicitar cotação, Peças já
+            cotadas ou Pronta entrega. Peças com sinal são aquelas que ainda não
+            estão no Brasil.
           </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <div className="brutalist-border p-6">
-              <h2 className="text-xl font-bold mb-4 uppercase">RECENT LEADS</h2>
-              <p className="text-muted-foreground">No leads yet. Start by creating your first campaign.</p>
+        </header>
+
+        <section id="cotacao" className="max-w-5xl mx-auto px-4 mb-16">
+          <h2 className="text-2xl font-bold text-center mb-6 uppercase">Solicite uma cotação</h2>
+          <div className="brutalist-border bg-white p-8 flex flex-col md:flex-row gap-8">
+            <div
+              className={`w-full md:w-1/2 h-48 border-2 border-dashed ${uploadedImage ? 'border-black' : 'border-gray-400'} flex items-center justify-center cursor-pointer`}
+              onClick={() => document.getElementById('fileInput')?.click()}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
+              {uploadedImage ? (
+                <img src={uploadedImage} alt="Product preview" className="max-h-full max-w-full" />
+              ) : (
+                <div className="text-center p-4 text-gray-500">
+                  <p>Arraste uma foto ou clique para enviar</p>
+                </div>
+              )}
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
             </div>
             
-            <div className="brutalist-border p-6">
-              <h2 className="text-xl font-bold mb-4 uppercase">PERFORMANCE</h2>
-              <p className="text-muted-foreground">No data available. Check back after your first campaign.</p>
+            <form onSubmit={handleSubmitQuote} className="w-full md:w-1/2 space-y-4">
+              <div>
+                <label className="block font-bold text-sm mb-1">NOME DA PEÇA</label>
+                <input
+                  type="text"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  required
+                  className="brutalist-input w-full"
+                  placeholder="Ex: Bolsa Chanel Classic Flap"
+                />
+              </div>
+              
+              <div>
+                <label className="block font-bold text-sm mb-1">ESTADO DA PEÇA</label>
+                <select
+                  value={itemState}
+                  onChange={(e) => setItemState(e.target.value)}
+                  required
+                  className="brutalist-input w-full"
+                >
+                  <option value="">Selecione o estado</option>
+                  <option value="novo">Novo</option>
+                  <option value=">9.5">Acima de 9.5</option>
+                  <option value=">9">Acima de 9</option>
+                  <option value=">8.5">Acima de 8.5</option>
+                  <option value="8.5">8.5 para baixo</option>
+                </select>
+              </div>
+              
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="brutalist-button w-full"
+              >
+                {isSubmitting ? 'ENVIANDO...' : 'SOLICITAR COTAÇÃO'}
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <section id="cotadas" className="max-w-5xl mx-auto px-4 mb-16">
+          <h2 className="text-2xl font-bold text-center mb-6 uppercase">Peças já cotadas</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="brutalist-border p-4">
+              <img
+                src="https://cdn.sistemawbuy.com.br/arquivos/4b696c75bb15f9312d4927785e5708e2/produtos/QE8TA8/bolsa-de-corrente-media-preta-com-metais-dourados-chanel-inspired-01-4510.jpg"
+                alt="Bolsa preta"
+                className="w-full h-64 object-cover mb-4"
+              />
+              <div className="text-center">
+                <p className="text-xl font-bold">R$ 18.000</p>
+                <p className="mb-4">40% de sinal</p>
+                <button 
+                  onClick={() => navigate('/products/1')} 
+                  className="brutalist-button w-full"
+                >
+                  RESERVAR COM SINAL
+                </button>
+              </div>
+            </div>
+            
+            <div className="brutalist-border p-4">
+              <img
+                src="https://cdnv2.moovin.com.br/karitaideale/imagens/produtos/det/bolsa_transversal_media_matelasse__-62615ce774e1f53fcf326d0e5654d97e.jpg"
+                alt="Bolsa matelassê"
+                className="w-full h-64 object-cover mb-4"
+              />
+              <div className="text-center">
+                <p className="text-xl font-bold">R$ 9.000</p>
+                <p className="mb-4">45% de sinal</p>
+                <button 
+                  onClick={() => navigate('/products/2')} 
+                  className="brutalist-button w-full"
+                >
+                  RESERVAR COM SINAL
+                </button>
+              </div>
+            </div>
+            
+            <div className="brutalist-border p-4">
+              <img
+                src="https://authenticfeet.vtexassets.com/arquivos/ids/474284/FQ733-1-001-1-AF-800x1000.jpg?v=638592654455130000"
+                alt="Tênis preto"
+                className="w-full h-64 object-cover mb-4"
+              />
+              <div className="text-center">
+                <p className="text-xl font-bold">R$ 13.500</p>
+                <p className="mb-4">40% de sinal</p>
+                <button 
+                  onClick={() => navigate('/products/3')} 
+                  className="brutalist-button w-full"
+                >
+                  RESERVAR COM SINAL
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div className="brutalist-card">
-          <h2 className="text-xl font-bold mb-4 uppercase">QUICK ACTIONS</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <Button className="brutalist-button">NEW CAMPAIGN</Button>
-            <Button className="brutalist-button">IMPORT LEADS</Button>
-            <Button className="brutalist-button">ANALYTICS</Button>
+        </section>
+
+        <section id="pronta" className="max-w-5xl mx-auto px-4 mb-16">
+          <h2 className="text-2xl font-bold text-center mb-6 uppercase">Peças à pronta entrega</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="brutalist-border p-4">
+              <img
+                src="https://meiasola.vtexassets.com/arquivos/ids/719737/bolsa-marrom-eco-big-floater-pequena-arezzo-1.jpg?v=637971444133930000"
+                alt="Bolsa marrom pequena"
+                className="w-full h-64 object-cover mb-4"
+              />
+              <div className="text-center">
+                <p className="text-xl font-bold">R$ 6.500</p>
+                <button 
+                  onClick={() => navigate('/products/4')} 
+                  className="brutalist-button w-full"
+                >
+                  COMPRAR AGORA
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       </main>
       
-      {/* Footer */}
-      <footer className="brutalist-border-t mt-12 py-6 text-center">
-        <p className="font-mono">© 2025 HYPELEADS. ALL RIGHTS RESERVED.</p>
+      <footer className="border-t-2 border-black py-8 text-center">
+        <p className="font-bold">© 2025 IMPORTA LUXO. TODOS OS DIREITOS RESERVADOS.</p>
       </footer>
     </div>
   );
