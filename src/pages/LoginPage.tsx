@@ -17,20 +17,22 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     
     try {
-      // For demonstration, we're simulating an API call
-      // In a real app, this would be a fetch to your backend
-      const loginData = {
-        email,
-        password
-      };
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
       
-      console.log('Login Request:', loginData);
+      console.log('Login Request:', { email, password });
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
       
-      // Simulate successful login
-      localStorage.setItem('user', JSON.stringify({ email }));
+      const data = await response.json();
+      localStorage.setItem('user', JSON.stringify(data.user || { email }));
       
       toast({
         title: "Login successful",
@@ -44,6 +46,7 @@ const LoginPage: React.FC = () => {
         description: "Please check your credentials",
         variant: "destructive",
       });
+      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }

@@ -29,7 +29,6 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
     
     try {
-      // For demonstration, we're simulating an API call
       const registerData = {
         nome,
         email,
@@ -38,11 +37,20 @@ const RegisterPage: React.FC = () => {
       
       console.log('Register Request:', registerData);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('http://localhost:3000/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registerData),
+      });
       
-      // Simulate successful registration
-      localStorage.setItem('user', JSON.stringify({ nome, email }));
+      if (!response.ok) {
+        throw new Error('Registration failed');
+      }
+      
+      const data = await response.json();
+      localStorage.setItem('user', JSON.stringify(data.user || { nome, email }));
       
       toast({
         title: "Registration successful",
@@ -56,6 +64,7 @@ const RegisterPage: React.FC = () => {
         description: "Please try again",
         variant: "destructive",
       });
+      console.error('Register error:', error);
     } finally {
       setLoading(false);
     }
