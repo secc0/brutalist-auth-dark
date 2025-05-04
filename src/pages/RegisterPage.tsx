@@ -37,7 +37,7 @@ const RegisterPage: React.FC = () => {
       
       console.log('Register Request:', registerData);
       
-      const response = await fetch('http://localhost:3000/auth/register', {
+      const response = await fetch('https://validation-graduation-learning-listed.trycloudflare.com/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
